@@ -1,0 +1,35 @@
+config:
+  target: "http://127.0.0.1:8080"
+  phases:
+    - duration: 10
+      arrivalRate: 1
+      rampTo: 5
+      name: Warm up phase
+    - duration: 30
+      arrivalRate: 5
+      rampTo: 100
+      name: Ramp up load
+    - duration: 20
+      arrivalRate: 100
+      rampTo: 30
+      name: Spike phase
+  payload:
+    path: "users.csv"
+    fields:
+      - "userId"
+      - "email"
+  headers:
+    Content-Type: "application/json"
+  plugins:
+    expect: {}
+  processor: "./processor.js"
+
+scenarios:
+  - name: "Claim coupon flow"
+    flow:
+      - post:
+          url: "/api/coupons/highValue/claim"
+          json:
+            userId: "{{ userId }}"
+            email: "{{ email }}"
+            couponCode: "xyz15"
